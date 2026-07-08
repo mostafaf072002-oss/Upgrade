@@ -28,8 +28,8 @@ class ReportController(report.ReportController):
                     del data["context"]["lang"]
                 context.update(data["context"])
             xlsx = report.with_context(context)._render_xlsx(docids, data=data)[0]
-            report_name = report.report_file
-            if report.print_report_name and not len(docids) > 1:
+            report_name = report.report_file or report.name or report.report_name
+            if report.print_report_name and docids and len(docids) == 1:
                 obj = request.env[report.model].browse(docids[0])
                 report_name = safe_eval(report.print_report_name, {"object": obj})
             xlsxhttpheaders = [
