@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="property_dashboard">
+
+        <div class="container mt16">
+            <h1>Properties Dashboard</h1>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Code</th>
+                        <th>Expected Price</th>
+                        <th>Selling Price</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <t t-foreach="widget.properties" t-as="property">
+                        <tr>
+                            <td>
+                                <t t-esc="property.name"/>
+                            </td>
+                            <td>
+                                <t t-esc="property.code"/>
+                            </td>
+                            <td>
+                                <t t-esc="property.expected_price"/>
+                            </td>
+                            <td>
+                                <t t-esc="property.selling_price"/>
+                            </td>
+                            <td>
+                                <t t-esc="property.state"/>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+
+        </div>
+
+    </t>
+
+</templates>

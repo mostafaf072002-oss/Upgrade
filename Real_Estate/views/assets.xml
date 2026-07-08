@@ -1,0 +1,9 @@
+<odoo>
+    <template id="assets_backend" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+
+            <script type="text/javascript"
+                    src="/Real_Estate/static/src/components/js/property_dashboard.js"/>
+        </xpath>
+    </template>
+</odoo>
