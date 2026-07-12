@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="report.paperformat" id="paper_format_report">
+            <field name="name">paperformat.report</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="page_width">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">5</field>
+            <field name="margin_right">2</field>
+            <field name="margin_bottom">5</field>
+            <field name="margin_left">2</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">0</field>
+            <field name="dpi">90</field>
+        </record>
+        <report
+                id="report_receipt_voucher_action"
+                model="account.move"
+                string="Receipt Voucher"
+                report_type="qweb-pdf"
+                name="bi_print_journal_entries.report_receipt_voucher"
+                paperformat="estate_accounting_custom.paper_format_report"
+                menu="False"
+        />
+        <template id="custom_layout">
+            <t t-if="not o" t-set="o" t-value="doc"/>
+
+            <t t-if="not company">
+                <!-- Multicompany -->
+                <t t-if="company_id">
+                    <t t-set="company" t-value="company_id"/>
+                </t>
+                <t t-elif="o and 'company_id' in o and o.company_id.sudo()">
+                    <t t-set="company" t-value="o.company_id.sudo()"/>
+                </t>
+                <t t-else="else">
+                    <t t-set="company" t-value="res_company"/>
+                </t>
+            </t>
+
+            <div class="header">
+                <div class="row">
+                    <div class="col-2 text-left">
+                    </div>
+                    <div class="col-2 offset-2 text-center">
+                        <span t-esc="company.name"/>
+                    </div>
+                    <div class="col-3 offset-3 text-right">
+                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y %H:%M')"/>
+                        <span>تاريخ الاصدار</span>
+                    </div>
+
+                </div>
+            </div>
+            <div class="article" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
+                 t-att-data-oe-lang="o and o.env.context.get('lang')">
+                <t t-raw="0"/>
+            </div>
+        </template>
+
+        <template id="report_receipt_voucher">
+            <t t-call="web.html_container">
+                <t t-call="bi_print_journal_entries.custom_layout">
+                    <div class="page">
+                        <div style="border-bottom: 3px solid #dee2e6;height:80px;">
+                            <!--                            <div style="position: absolute; top:-20px; right:0; margin-left:20px">-->
+                            <!--                                &lt;!&ndash;<img t-if="res_company.logo" alt="Company LOGO"-->
+                            <!--                                     t-att-src="'data:image/png;base64,%s' % to_text(res_company.logo)"-->
+                            <!--                                     width="150" height="90"/>&ndash;&gt;-->
+                            <!--                                <br></br>-->
+                            <!--                                <img class="img"-->
+                            <!--                                     src="/estate_accounting_custom/static/description/src/img/right_logo.png"-->
+                            <!--                                     width="120" height="60" top="-10"/>-->
+                            <!--                            </div>-->
+                            <div>
+                                <h4 class="text-center">
+                                    إيصال استلام نقدية / شيك
+                                </h4>
+                                <h4 class="text-center">
+                                    <t t-esc="receipt_num"/>
+                                </h4>
+                            </div>
+                            <!--                            <div style="position: absolute; top: 10px; left:0; margin-left:50px">-->
+                            <!--                                <img t-if="res_company.logo" alt="Company LOGO"-->
+                            <!--                                     t-att-src="'data:image/png;base64,%s' % to_text(res_company.logo)"-->
+                            <!--                                     width="120" height="60"/>-->
+
+                            <!--                            </div>-->
+                        </div>
+                        <br/>
+                        <!--                        <style>-->
+                        <!--                            .table-sm th, .table-sm tr {-->
+                        <!--                            line-height: 1.6;-->
+                        <!--                            }-->
+                        <!--                            .table-sm th, .table-sm td {-->
+                        <!--                            /*padding-right: 4.3rem;*/-->
+                        <!--                            text-align: right;-->
+                        <!--                            }-->
+                        <!--                        </style>-->
+                        <table class="table table-sm" style="font-size:20px; width:100%;">
+                            <tr class="thead-light" style="padding:10px;">
+                                <td style="text-align: center; background-color: #dddddd;width: 200px;">
+                                    <t t-esc="payment_amount"/>
+                                </td>
+                                <td style="text-align: center;border: #dee2e6;" colspan="2" dir="ltr">
+                                    <span>
+                                        <t t-esc="payment_date.strftime('%d-%m-%Y')"/>
+                                    </span>
+                                </td>
+                                <td style="text-align: right;width: 200px;border: #dee2e6;">
+                                    التاريخ
+                                </td>
+                            </tr>
+                            <tr class="thead-light" style="padding-bottom:10px;">
+                                <td style="text-align: center;border: #dee2e6;" colspan="3">
+                                    <span>
+                                        <t t-esc="partner_name"/>
+                                    </span>
+                                </td>
+                                <td style="text-align: right;width: 200px;border: #dee2e6;">
+                                    استلمنا من السيد/ة
+                                </td>
+                            </tr>
+                            <tr class="thead-light" style="padding-bottom:10px;">
+                                <td style="text-align: center;" colspan="3">
+                                    <span>
+                                        <t t-esc="text_free"/>
+                                    </span>
+                                </td>
+                                <td style="text-align: right;width: 200px;">
+
+                                </td>
+                            </tr>
+                            <tr class="thead-light" style="padding-bottom:10px;">
+                                <td style="text-align: center;background-color: #dddddd;width: 200px;border: #dee2e6;"
+                                    colspan="3">
+                                    <t t-esc="payment_amount_words"/>
+                                </td>
+                                <td style="text-align: right;width: 200px;border: #dee2e6;">
+                                    مبلغ و قدره
+                                </td>
+                            </tr>
+                            <tr class="thead-light" style="padding-bottom:10px;">
+                                <td style="text-align: center;background-color: #dddddd;width: 200px;border: #dee2e6;"
+                                    colspan="3" t-if="currency !='EGP'">
+                                    <t t-esc="currency_rate"/>
+                                </td>
+                                <td style="text-align: right;width: 200px;border: #dee2e6;" t-if="currency !='EGP'">
+                                    (بما يعادل (جنيه مصري
+                                </td>
+                            </tr>
+                            <tr class="thead-light" style="padding-bottom:10px;" t-if="unit">
+                                <td style="text-align: center;width: 200px;border: #dee2e6;direction: rtl;" colspan="3">
+                                    <t t-esc="unit"/>
+
+                                </td>
+                                <td style="text-align: right;width: 200px;border: #dee2e6;">
+                                    وذلك عن وحده رقم
+                                </td>
+                            </tr>
+                            <tr class="thead-light" style="padding-bottom:10px;" t-if="project">
+                                <td style="text-align: center;width: 200px;border: #dee2e6;direction: rtl;" colspan="3">
+                                    <t t-esc="project"/>
+
+                                </td>
+                                <td style="text-align: right;width: 200px;border: #dee2e6;">
+                                    وذلك عن مشروع
+                                </td>
+                            </tr>
+                            <tr class="thead-light" style="padding-bottom:10px;">
+                                <td style="text-align: center;width: 200px;border: #dee2e6;" colspan="3">
+                                    <t t-esc="label"/>
+                                </td>
+                                <td style="text-align: right;width: 200px;border: #dee2e6;">
+                                    نظير
+                                </td>
+                            </tr>
+                            <tr class="thead-light">
+                                <td t-if="cheque_or_not =='شيك'" style="text-align: center;border: #dee2e6;">
+                                    <t t-esc="cheque_no"/>
+                                </td>
+                                <td t-if="cheque_or_not =='شيك'"
+                                    style="text-align: right;width: 200px;border: #dee2e6;">
+                                    رقم الشيك
+                                </td>
+                                <td t-if="cheque_or_not == 'نقدى'" colspan="3"
+                                    style="text-align: center;border: #dee2e6;">
+                                    <t t-esc="cheque_or_not"/>
+                                </td>
+
+                                <td t-if="cheque_or_not in ('فيزا','تحويل بنكى')"
+                                    style="text-align: center;border: #dee2e6;">
+                                    <t t-esc="bank_name"/>
+                                </td>
+                                <td t-if="cheque_or_not in ('فيزا','تحويل بنكى')"
+                                    style="text-align: center;border: #dee2e6;">
+                                    بنك
+                                </td>
+                                <td t-if="cheque_or_not in ('فيزا','تحويل بنكى')"
+                                    style="text-align: center;border: #dee2e6;">
+                                    <t t-esc="cheque_or_not"/>
+                                </td>
+
+
+                                <td t-if="cheque_or_not =='شيك'" style="text-align: center;border: #dee2e6;">
+                                    <t t-esc="cheque_or_not"/>
+                                </td>
+                                <td style="text-align: right;width: 200px;border: #dee2e6;">
+                                    طريقة الدفع
+                                </td>
+                            </tr>
+                            <tr t-if="cheque_or_not =='شيك'" class="thead-light">
+                                <td style="text-align: center;border: #dee2e6;">
+                                    <t t-esc="cheque_date"/>
+                                </td>
+                                <td style="text-align: right;width: 200px;border: #dee2e6;">
+                                    تاريخ الشيك
+                                </td>
+                                <td style="text-align: center;border: #dee2e6;">
+                                    <t t-esc="bank_name"/>
+                                </td>
+                                <td style="text-align: right;width: 200px;border: #dee2e6;">
+                                    اسم البنك
+                                </td>
+                            </tr>
+
+                            <tr class="thead-light" style="padding-bottom:10px;">
+                                <td
+                                        style="text-align: center;width: 200px;border: #dee2e6;">
+                                    ،، يعتمد
+                                </td>
+                                <td
+                                        style="text-align: center;width: 200px;border: #dee2e6;">
+                                    مراجعة
+                                </td>
+                                <td
+                                        style="text-align: center;width: 200px;border: #dee2e6;">
+                                    <span>
+                                        <t t-esc="user1.name"/>
+                                    </span>
+                                </td>
+                                <td style="text-align: right;width: 200px;border: #dee2e6;">
+                                    تمت العملية بواسطة
+                                </td>
+                            </tr>
+                            <tr class="thead-light" style="padding-bottom:10px;">
+                                <td style="text-align: center;width: 200px;border: #dee2e6;">
+                                    ..................................
+                                </td>
+                                <td style="text-align: center;width: 200px;border: #dee2e6;">
+                                    ..................................
+                                </td>
+                                <td style="text-align: center;width: 200px;border: #dee2e6;">
+                                    <img t-if="user1.employee_id.signiture and cash_type == 'in'"
+                                         t-att-src="'data:image/png;base64,%s' % to_text(user1.employee_id.signiture)"
+                                         style="max-height:70px; max-width:140px;"/>
+
+                                </td>
+                                <td style="text-align: right;width: 200px;border: #dee2e6;">
+                                    التوقيع
+                                </td>
+                            </tr>
+                            <tr class="thead-light" style="padding-bottom:10px;">
+                                <td style="text-align: center;width: 200px;border: #dee2e6;">
+                                    ..................................
+                                </td>
+                                <td style="text-align: center;width: 200px;border: #dee2e6;">
+                                    ..................................
+                                </td>
+                                <td style="text-align: center;width: 200px;border: #dee2e6;">
+                                    ..................................
+                                </td>
+                                <td style="text-align: right;width: 200px;border: #dee2e6;">
+                                    اسم المستلم
+                                </td>
+                            </tr>
+
+                        </table>
+                        <br/>
+                        <!--                        <div style="border-bottom: 3px solid #dee2e6;height:80px;font-size:11px;">-->
+                        <!--                            <h4 class="text-left" style="font-size:11px;">-->
+                        <!--                                Reference-->
+                        <!--                            </h4>-->
+                        <!--                            <h4 class="text-left" style="font-size:11px;">-->
+                        <!--                                <t t-esc="ref"/>-->
+                        <!--                            </h4>-->
+                        <!--                        </div>-->
+
+                    </div>
+                </t>
+            </t>
+        </template>
+
+    </data>
+</odoo>
+

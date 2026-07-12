@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+
+        <record model="report.paperformat" id="report_format_view">
+            <field name="name">paperformat.report</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="page_width">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Landscape</field>
+            <field name="margin_top">10</field>
+            <field name="margin_right">2</field>
+            <field name="margin_bottom">10</field>
+            <field name="margin_left">2</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">10</field>
+            <field name="dpi">90</field>
+        </record>
+        <report
+                id="journal_entry_report_action"
+                model="account.move"
+                string="Journal Entries"
+                report_type="qweb-pdf"
+                paperformat="report_format_view"
+                name="bi_print_journal_entries.journal_entry_report_template_id"
+                menu="False"
+        />
+
+        <template id="journal_entry_template_report_view">
+            <t t-call="web.internal_layout">
+                <!--                <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})"/>-->
+                <div class="page">
+                    <!-- <br/><br/>
+                     <div class="oe_structure"/>
+                         <div>
+                             <h3 class="text-center mb32">
+                                 <strong>Journal Entry</strong>
+                             </h3>
+                         </div>
+                     <br/>-->
+                    <div style="border-bottom: 3px solid black;height: 100px;">
+                        <div>
+                            <h1 class="text-center" style="text-align: center">
+                                Journal Entry
+                            </h1>
+                        </div>
+                        <div style="position: absolute; top:-20px; left:0; margin-left:20px">
+                            <br></br>
+                            <img t-if="res_company.logo" alt="Company LOGO"
+                                 t-att-src="'data:image/png;base64,%s' % to_text(res_company.logo)"
+                                 width="150" height="90"/>
+                        </div>
+                    </div>
+
+                    <div class="row" id="journal_information">
+                        <div class="col-8">
+                            <div>
+                                <strong>Journal Entry :</strong>
+                                <p t-field="o.name"/>
+                            </div>
+                            <div>
+                                <strong>Parallel Number :</strong>
+                                <p t-field="o.parallel_move_name"/>
+                            </div>
+
+                            <div class="text-left">
+                                <strong>Date :</strong>
+                                <p t-field="o.date"/>
+                            </div>
+                        </div>
+
+                        <div class="col-8">
+                            <div>
+                                <strong>Journal :</strong>
+                                <p t-field="o.journal_id"/>
+                            </div>
+                            <div class="text-left">
+                                <strong>Reference :</strong>
+                                <p t-field="o.ref"/>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <br/>
+                    <br/>
+                    <table style="border-collapse: collapse;width: 100%;" class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Account Code</th>
+                                <th>Account Name</th>
+                                <th>Partner</th>
+                                <th>Label</th>
+                                <th>Unit</th>
+                                <th>Due Date</th>
+                                <th>Analytic Account</th>
+                                <th>Taxes(%)</th>
+                                <th>Amount in Currency</th>
+                                <th>Debit</th>
+                                <th>Credit</th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody class="consumed_tbody">
+                            <t t-set="total" t-value="0.0"/>
+                            <t t-set="total1" t-value="0.0"/>
+                            <t t-foreach="o.line_ids" t-as="line">
+                                <tr>
+                                    <td>
+                                        <span t-field="line.account_id.code"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="line.account_id.name"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="line.partner_id"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="line.name"/>
+                                    </td>
+                                    <td>
+                                        <t t-if="line.unit_id">
+                                            <span t-field="line.unit_id"/>
+                                        </t>
+                                        <t t-else="">
+                                            <t t-if="o.new_unit_id">
+                                                <span t-field="o.new_unit_id"/>
+                                            </t>
+                                        </t>
+                                    </td>
+                                    <td>
+                                        <span t-field="line.date_maturity"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="line.analytic_account_id"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="line.tax_ids"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="line.amount_currency"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="line.debit"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="line.credit"/>
+                                    </td>
+
+                                </tr>
+                                <t t-set="total" t-value="total + line.debit"/>
+                                <t t-set="total1" t-value="total1 + line.credit"/>
+                            </t>
+                            <td colspan="8"></td>
+                            <td>
+                                <strong>Total:</strong>
+                            </td>
+                            <td width="10%">
+                                <strong>
+                                    <span>
+                                        <t t-esc="total"/>
+                                    </span>
+                                </strong>
+                            </td>
+                            <td width="10%">
+                                <strong>
+                                    <span>
+                                        <t t-esc="total1"/>
+                                    </span>
+                                </strong>
+                            </td>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </template>
+
+        <template id="journal_entry_report_template_id">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="bi_print_journal_entries.journal_entry_template_report_view" t-lang="o.partner_id.lang"/>
+                </t>
+            </t>
+        </template>
+
+    </data>
+</odoo>

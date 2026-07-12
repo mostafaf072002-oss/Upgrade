@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_move_statement_form" model="ir.ui.view">
+            <field name="name">account.move.inherit.view.form</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header" position="inside">
+                    <field name="move_type" invisible="1"/>
+                    <button
+                            name="action_print_journal_entry"
+                            string="Print Journal Entries"
+                            type="object"
+                            class="oe_highlight"
+                    />
+                    <button name="print_report_comp"
+                            type="object"
+                            string="Receipt Voucher"
+                            class="oe_highlight"/>
+                    <!--                    <button name="print_report_comp2"-->
+                    <!--                            type="object"-->
+                    <!--                            string="Receipt Exchange"-->
+                    <!--                            class="oe_highlight"/>-->
+                    <!--                    attrs="{'invisible':[('move_type','!=','entry')]}"-->
+                </xpath>
+            </field>
+        </record>
+
+        # This record defines the report template for journal entries multiple print
+        <record id="action_multi_print_journal_entries" model="ir.actions.server">
+            <field name="name">Print Journal Entries</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="binding_model_id" ref="account.model_account_move"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+                action = records.action_print_journal_entry()
+            </field>
+        </record>
+
+
+        <record id="account_move_search_inherit_add_account_ids" model="ir.ui.view">
+            <field name="name">account.move.search.inherit.add.account.ids</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_account_move_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <field name="account_ids" string="Account"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
